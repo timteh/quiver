@@ -1,12 +1,8 @@
 /* Copy-to-clipboard for the contract address. Vanilla, no deps.
    Uses the async Clipboard API when available, else a selection + execCommand fallback (file://, old browsers). */
 (function () {
-  var btn = document.getElementById('copy-btn');
-  if (!btn) return;
-  var target = document.getElementById(btn.getAttribute('data-copy-target'));
-  var label = btn.querySelector('.copy-label');
-  var status = document.getElementById('copy-status');
-  var timer;
+  var btns = document.querySelectorAll('.copy-btn[data-copy-target]');
+  if (!btns.length) return;
 
   function fallbackCopy(text) {
     var ta = document.createElement('textarea');
@@ -22,6 +18,11 @@
     return ok ? Promise.resolve() : Promise.reject(new Error('copy failed'));
   }
 
+  function wire(btn) {
+  var target = document.getElementById(btn.getAttribute('data-copy-target'));
+  var label = btn.querySelector('.copy-label');
+  var status = document.getElementById(btn.getAttribute('data-copy-status') || 'copy-status');
+  var timer;
   function show(ok) {
     clearTimeout(timer);
     btn.classList.toggle('is-copied', ok);
@@ -43,4 +44,6 @@
       : fallbackCopy(text);
     p.then(function () { show(true); }, function () { show(false); });
   });
+  }
+  for (var i = 0; i < btns.length; i++) wire(btns[i]);
 })();
